@@ -1,23 +1,34 @@
 name: Build Binary
 on: [push]
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6 # Updated from v4 to v6
+      # Step 1: Download your code onto the runner
+      - uses: actions/checkout@v6 
       
+      # Step 2: Install dependencies (JSON library)
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake g++
+
+      # Step 3: Run the Build
       - name: Compile
         run: |
-          # Create build folder
+          # Create a separate folder for the build files
           mkdir -p build
-          # Run CMake and tell it the source is in the current directory (.)
-          # And put the output in the build folder (B build)
+          # -S . means look for CMakeLists.txt in the CURRENT folder
+          # -B build means put the output in the build folder
           cmake -S . -B build
-          # Build the project
+          # Compile the code
           cmake --build build
-          
+
+      # Step 4: Save the result as a downloadable zip
       - name: Save Result
-        uses: actions/upload-artifact@v6 # Updated from v4 to v6
+        uses: actions/upload-artifact@v7
         with:
-          name: my-binary
+          name: cg-workspace-binary
+          # This must match the name of the executable set in CMakeLists.txt
           path: build/cg_workspace
