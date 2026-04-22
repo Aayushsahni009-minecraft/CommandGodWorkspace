@@ -1,34 +1,30 @@
-name: Build Binary
+name: Build Graphical Workspace
 on: [push]
 
 jobs:
-  build:
+  build-linux:
     runs-on: ubuntu-latest
     steps:
-      # Step 1: Download your code onto the runner
+      # Use v6 for Node 24 support in 2026
       - uses: actions/checkout@v6 
-      
-      # Step 2: Install dependencies (JSON library)
-      - name: Install Dependencies
+
+      - name: Install System Graphics Libraries
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake g++
+          # libsdl2-dev provides the headers and logic for windows
+          sudo apt-get install -y cmake g++ libsdl2-dev 
 
-      # Step 3: Run the Build
-      - name: Compile
+      - name: Configure and Compile
         run: |
-          # Create a separate folder for the build files
           mkdir -p build
-          # -S . means look for CMakeLists.txt in the CURRENT folder
-          # -B build means put the output in the build folder
+          # -S . looks for CMakeLists.txt in the root
           cmake -S . -B build
-          # Compile the code
           cmake --build build
 
-      # Step 4: Save the result as a downloadable zip
-      - name: Save Result
+      - name: Upload Workspace Binary
         uses: actions/upload-artifact@v7
         with:
-          name: cg-workspace-binary
-          # This must match the name of the executable set in CMakeLists.txt
+          name: cg-workspace-windowed
           path: build/cg_workspace
+          # In 2026, set archive to false if you want a direct file download
+          archive: true

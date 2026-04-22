@@ -1,59 +1,39 @@
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
-#include <GLFW/glfw3.h>
+#include <SDL.h>
 #include <iostream>
-
-// Include our custom Workspace engines
 #include "ManifestGenerator.h"
-#include "TextureManager.h"
 
-int main() {
-    // [GLFW Window Initialization Code Goes Here]
-    // [ImGui Context Setup Code Goes Here]
-
-    std::string generatedJson = "";
-
-    // Main Application Loop
-    while (!glfwWindowShouldClose(window)) {
-        glfwPollEvents();
-
-        // Start new ImGui frame
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-
-        // Build the Workspace UI
-        ImGui::Begin("Command God Workspace - Tools");
-
-        if (ImGui::CollapsingHeader("JSON Generator")) {
-            ImGui::Text("Generate a standard Behavior Pack Manifest:");
-            if (ImGui::Button("Generate Manifest")) {
-                generatedJson = ManifestGenerator::CreateBehaviorPackManifest("My Epic Addon", "Built with CG Workspace");
-            }
-            
-            // Display the generated JSON in a read-only text box
-            if (!generatedJson.empty()) {
-                ImGui::InputTextMultiline("Output", &generatedJson[0], generatedJson.size(), ImVec2(-FLT_MIN, ImGui::GetTextLineHeight() * 16), ImGuiInputTextFlags_ReadOnly);
-            }
-        }
-
-        if (ImGui::CollapsingHeader("Texture Manager")) {
-            ImGui::Text("Test STB Image Loading:");
-            if (ImGui::Button("Load Test Texture (dirt.png)")) {
-                // Assuming you have a dirt.png in your assets folder
-                TextureManager::InspectTexture("assets/dirt.png");
-            }
-        }
-
-        ImGui::End();
-
-        // Rendering
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        glfwSwapBuffers(window);
+int main(int argc, char* argv[]) {
+    // Initialize SDL
+    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+        return 1;
     }
 
-    // Cleanup code
+    // Create a Window (This will fill the phone screen)
+    SDL_Window* window = SDL_CreateWindow("Command God Workspace", 
+        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
+        800, 600, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
+
+    if (!window) {
+        SDL_Quit();
+        return 1;
+    }
+
+    bool running = true;
+    SDL_Event event;
+
+    // Main App Loop
+    while (running) {
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT) running = false;
+        }
+
+        // Just a clear screen for now (Green like Minecraft grass!)
+        SDL_Surface* screen = SDL_GetWindowSurface(window);
+        SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 50, 150, 50));
+        SDL_UpdateWindowSurface(window);
+    }
+
+    SDL_DestroyWindow(window);
+    SDL_Quit();
     return 0;
 }

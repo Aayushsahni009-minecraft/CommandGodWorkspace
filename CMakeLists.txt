@@ -3,15 +3,15 @@ project(CommandGodWorkspace)
 
 set(CMAKE_CXX_STANDARD 17)
 
-# Include directories for your vendor libraries
-include_directories(vendor/imgui vendor/nlohmann vendor/stb)
+# Find SDL2 (Crucial for windows on Android/Linux)
+find_package(SDL2 REQUIRED)
 
-# Add your source files
-file(GLOB SOURCES "src/*.cpp" "vendor/imgui/*.cpp")
+include(FetchContent)
+FetchContent_Declare(
+  json
+  URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz
+)
+FetchContent_MakeAvailable(json)
 
-add_executable(${PROJECT_NAME} ${SOURCES})
-
-# Link OpenGL and GLFW (Windowing library needed for ImGui)
-find_package(OpenGL REQUIRED)
-find_package(glfw3 REQUIRED)
-target_link_libraries(${PROJECT_NAME} glfw OpenGL::GL)
+add_executable(cg_workspace src/main.cpp)
+target_link_libraries(cg_workspace PRIVATE nlohmann_json::nlohmann_json SDL2::SDL2)
