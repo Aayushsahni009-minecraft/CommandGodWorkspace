@@ -8,10 +8,13 @@ jobs:
       
       - name: Compile
         run: |
-          mkdir build
-          cd build
-          cmake ..
-          make
+          # Create build folder
+          mkdir -p build
+          # Run CMake and tell it the source is in the current directory (.)
+          # And put the output in the build folder (B build)
+          cmake -S . -B build
+          # Build the project
+          cmake --build build
           
       - name: Save Result
         uses: actions/upload-artifact@v6 # Updated from v4 to v6
